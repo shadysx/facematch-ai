@@ -1,7 +1,17 @@
 import sys
-import dlib
+from face_detector import FaceDetector
 
-test = sys.argv[1];
+if len(sys.argv) < 3:
+    print(
+        "Call this program like this:\n"
+        "   ./cnn_face_detector.py mmod_human_face_detector.dat ../examples/faces/*.jpg\n"
+        "You can get the mmod_human_face_detector.dat file from:\n"
+        "    https://dlib.net/files/mmod_human_face_detector.dat.bz2")
+    exit()
 
-cnn_face_detector = dlib.cnn_face_detection_model_v1(sys.argv[1])
-win = dlib.image_window()
+detector = FaceDetector(sys.argv[1])
+
+for f in sys.argv[2:]:
+    print(f"Processing file: {f}")
+    detections, img = detector.detect_faces(f)
+    detector.display_results(detections, img)

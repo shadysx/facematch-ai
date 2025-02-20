@@ -6,7 +6,7 @@
       "type": "debugpy",
       "request": "launch",
       "program": "${file}",
-      "args": ["mmod_human_face_detector.dat"],
+      "args": ["mmod_human_face_detector.dat", "faces/face2.jpg"],
       "console": "integratedTerminal"
     }
   ]
