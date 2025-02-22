@@ -6,7 +6,20 @@
       "type": "debugpy",
       "request": "launch",
       "program": "${file}",
-      "args": ["mmod_human_face_detector.dat", "faces/face2.jpg"],
+      "args": ["models/mmod_human_face_detector.dat", "faces/face2.jpg"],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Python: Face Recognition",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "face_recognition.py",
+      "args": [
+        "models/shape_predictor_5_face_landmarks.dat",
+        "models/dlib_face_recognition_resnet_model_v1.dat",
+        "faces/500_humans",
+        "faces/unknown"
+      ],
       "console": "integratedTerminal"
     }
   ]

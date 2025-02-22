@@ -1,3 +1,5 @@
 venv/
 *.pyc
 .DS_Store 
+dlib_venv_0/
+raw_data/
