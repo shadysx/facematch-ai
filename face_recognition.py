@@ -3,14 +3,13 @@ import os
 import dlib
 import glob
 import numpy as np  
-import torch
 
 class FaceRecognizer:
     def __init__(self, predictor_path, face_rec_model_path):
         self.detector = dlib.get_frontal_face_detector()
         self.sp = dlib.shape_predictor(predictor_path)
         self.facerec = dlib.face_recognition_model_v1(face_rec_model_path)
-        self.win = dlib.image_window()
+        # self.win = dlib.image_window()
         self.known_faces = {} 
         self.matches_found = []
 
@@ -56,11 +55,6 @@ if __name__ == "__main__":
             "dlib_face_recognition_resnet_model_v1.dat known_faces_folder unknown_faces_folder")
         exit()
 
-    print(f"CUDA disponible: {torch.cuda.is_available()}")
-    if torch.cuda.is_available():
-        print(f"Carte GPU: {torch.cuda.get_device_name(0)}")
-
-    dlib.cuda.set_device(0)
 
     if dlib.DLIB_USE_CUDA:
         print("CUDA is enabled")
