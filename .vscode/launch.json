@@ -21,6 +21,18 @@
         "faces/unknown"
       ],
       "console": "integratedTerminal"
-    }
+    },
+    {
+      "name": "Python: FastAPI",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+          "face_recognition.api:app",
+          "--reload"
+      ],
+      "jinja": true,
+      "justMyCode": true
+  }
   ]
 }

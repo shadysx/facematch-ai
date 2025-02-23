@@ -30,6 +30,7 @@ class FaceDetector:
                   f"Right: {d.rect.right()} Bottom: {d.rect.bottom()} "
                   f"Confidence: {d.confidence}")
 
+
         rects = dlib.rectangles()
         rects.extend([d.rect for d in detections])
 
