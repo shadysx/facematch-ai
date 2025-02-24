@@ -33,4 +33,12 @@ $ python setup.py install --set DLIB_USE_CUDA=1
 ### API usage example
 ```bash
 curl -X POST -F "file=@unknown_face.jpg" http://localhost:8000/compare-face
+curl -X POST -F "file=@unknown_face.jpg" http://192.168.0.100:8000/compare-face
+```
+
+### Conda env names:
+```bash
+- Ubuntu Desktop: facematch_gpu
+- MacOs: facematch_gpu
+- Ubuntu Server: dlib 
 ```
