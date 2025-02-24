@@ -35,6 +35,10 @@ $ python setup.py install --set DLIB_USE_CUDA=1
 curl -X POST -F "file=@unknown_face.jpg" http://localhost:8000/compare-face
 curl -X POST -F "file=@unknown_face.jpg" http://192.168.0.100:8000/compare-face
 curl -X POST -F "file=@unknown_face.jpg" http://213.213.230.92:8000/compare-face
+
+curl -X GET http://localhost:8000/is-cuda-enabled 
+curl -X GET http://192.168.0.100:8000/is-cuda-enabled 
+curl -X GET http://213.213.230.92:8000/is-cuda-enabled 
 ```
 
 ### Conda env names:
