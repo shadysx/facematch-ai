@@ -17,6 +17,10 @@ async def clean_training_data():
     recognizer.clean_training_data()
     return {"message": "Training data cleaned"}
 
+@app.get("/is-cuda-enabled")
+async def is_cuda_enabled():
+    recognizer = FaceRecognizer()
+    return {"cuda_enabled": recognizer.is_cuda_enabled()}
 
 # Test endpoint
 @app.get("/hello")

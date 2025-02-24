@@ -139,6 +139,9 @@ class FaceRecognizer:
     def clean_training_data(self):
         if os.path.exists("../known_faces_descriptors.pkl"):
             os.remove("../known_faces_descriptors.pkl")
+    
+    def is_cuda_enabled(self):
+        return dlib.DLIB_USE_CUDA
 
 
 if __name__ == "__main__":
@@ -147,7 +150,7 @@ if __name__ == "__main__":
         recognizer.clean_training_data()
         exit()
 
-    if dlib.DLIB_USE_CUDA:
+    if recognizer.is_cuda_enabled():
         print("CUDA is enabled")
     else:
         print("CUDA is disabled")
