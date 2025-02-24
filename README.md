@@ -1,15 +1,6 @@
-
-
-
-
-# Usage example
-```bash
-python face_recognition.py "models/shape_predictor_5_face_landmarks.dat" "models/dlib_face_recognition_resnet_model_v1.dat" "faces/500_humans" "faces/unknown"
-```
-
-## Make sure to use gcc 8 and read every logs while installing!
-## Make sur nvidia drivers are installed
-## https://ubuntu.com/server/docs/nvidia-drivers-installation
+### Make sure to use gcc 8 and read every logs while installing!
+### Make sur nvidia drivers are installed
+### https://ubuntu.com/server/docs/nvidia-drivers-installation
 
 ```bash
 $ conda create -n facematch_gpu python=3.8 cmake ipython
