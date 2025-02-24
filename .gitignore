@@ -4,7 +4,7 @@ venv/
 dlib_venv_0/
 raw_data/
 downloaded_images/** 
-
+known_faces_descriptors.pkl
 dlib/
 *.swp
 .vscode/
