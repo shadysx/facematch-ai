@@ -52,46 +52,54 @@ class FaceRecognizer:
         return face_descriptors
 
     def compare_with_known_faces(self, img_path):
-        face_descriptor = self.compute_face_descriptor(img_path)
-        if face_descriptor is None:
-            print("No face detected in the image")
+        try:
+            face_descriptor = self.compute_face_descriptor(img_path)
+            if face_descriptor is None:
+                print("No face detected in the image")
+                return
+            img_name = os.path.basename(img_path)
+            self.all_distances[img_name] = {}
+            for name, known_descriptor in self.known_faces.items():
+                distance = np.linalg.norm(face_descriptor - known_descriptor)
+                self.all_distances[img_name][name] = distance
+                if distance < self.threshold:
+                    self.matches_found.append(name)
+        except Exception as e:
+            print(f"Error comparing with known faces: {e}")
             return
-        img_name = os.path.basename(img_path)
-        self.all_distances[img_name] = {}
-        for name, known_descriptor in self.known_faces.items():
-            distance = np.linalg.norm(face_descriptor - known_descriptor)
-            self.all_distances[img_name][name] = distance
-            if distance < self.threshold:
-                self.matches_found.append(name)
 
     async def compare_with_known_faces_from_upload(self, upload_file: UploadFile):
-        # Read the content of the uploaded file
-        contents = await upload_file.read()
-        # Convert to numpy array
-        nparr = np.frombuffer(contents, np.uint8)
-        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        # Convert BGR (OpenCV) to RGB (dlib)
-        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        # Detect and calculate the face descriptor
-        dets = self.detector(img_rgb, 1)
+        try:
+            # Read the content of the uploaded file
+            contents = await upload_file.read()
+            # Convert to numpy array
+            nparr = np.frombuffer(contents, np.uint8)
+            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            # Convert BGR (OpenCV) to RGB (dlib)
+            img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            # Detect and calculate the face descriptor
+            dets = self.detector(img_rgb, 1)
 
-        if len(dets) == 0:
-            print("No face detected in the image")
+            if len(dets) == 0:
+                print("No face detected in the image")
+                return
+
+            # Use the first detected face
+            shape = self.sp(img_rgb, dets[0])
+            face_descriptor = np.array(self.facerec.compute_face_descriptor(img_rgb, shape))
+            unknown_uploaded_image = upload_file.filename
+            self.all_distances[unknown_uploaded_image] = {}
+            n_known_faces = len(self.known_faces)
+
+            print(f"Comparing with {n_known_faces} known faces")
+            for file_path, known_descriptor in self.known_faces.items():
+                distance = np.linalg.norm(face_descriptor - known_descriptor)
+                self.all_distances[unknown_uploaded_image][file_path] = distance
+                if distance < self.threshold:
+                    self.matches_found.append(file_path)
+        except Exception as e:
+            print(f"Error comparing with known faces: {e}")
             return
-
-        # Use the first detected face
-        shape = self.sp(img_rgb, dets[0])
-        face_descriptor = np.array(self.facerec.compute_face_descriptor(img_rgb, shape))
-        unknown_uploaded_image = upload_file.filename
-        self.all_distances[unknown_uploaded_image] = {}
-        n_known_faces = len(self.known_faces)
-
-        print(f"Comparing with {n_known_faces} known faces")
-        for file_path, known_descriptor in self.known_faces.items():
-            distance = np.linalg.norm(face_descriptor - known_descriptor)
-            self.all_distances[unknown_uploaded_image][file_path] = distance
-            if distance < self.threshold:
-                self.matches_found.append(file_path)
 
     def load_and_compute_known_faces(self):
         """Load known faces from file or compute and save them if file doesn't exist."""
@@ -105,7 +113,7 @@ class FaceRecognizer:
                         self.compute_face_descriptor(full_path, label=name)
             self.save_known_faces(self.descriptors_file)
     
-    def get_n_closest_names_by_distance(self, n):
+    def get_n_closest_names_by_distance(self, n=10):
         # First names are the closest matches
         names_by_distance = []
         for _, distances in self.all_distances.items():
@@ -114,7 +122,7 @@ class FaceRecognizer:
                 names_by_distance.append(file_path.split('/')[0])
         return names_by_distance
     
-    def build_matches_response(self, n=10):
+    def build_matches_with_images_response(self, n=10):
         names_by_distance = self.get_n_closest_names_by_distance(n)
         matches = []
         for match_name in names_by_distance:

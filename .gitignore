@@ -3,7 +3,7 @@ venv/
 .DS_Store 
 dlib_venv_0/
 raw_data/
-downloaded_images/
+downloaded_images/** 
 
 dlib/
 *.swp

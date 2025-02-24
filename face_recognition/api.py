@@ -4,12 +4,19 @@ from recognizer import FaceRecognizer
 
 app = FastAPI()
 
-@app.post("/compare-face")
+@app.post("/get-matches-names")
 async def compare_face(file: UploadFile):
     recognizer = FaceRecognizer()
     recognizer.load_and_compute_known_faces()
     await recognizer.compare_with_known_faces_from_upload(file)
-    return recognizer.build_matches_response(1)
+    return recognizer.build_matches_with_images_response(1)
+
+@app.post("/get-matches-with-images")
+async def get_matches_with_images(file: UploadFile):
+    recognizer = FaceRecognizer()
+    recognizer.load_and_compute_known_faces()
+    await recognizer.compare_with_known_faces_from_upload(file)
+    return recognizer.build_matches_with_images_response(1)
 
 @app.post("/clean-training-data")
 async def clean_training_data():

@@ -50,7 +50,7 @@ def download_images(url, actress_name='default_name', image_to_download=5):
             print(f"Error while downloading {img_url}: {str(e)}")
 
 def get_actress_links():
-    # URL de base
+    # Base URL
     base_url = "https://www.thumbnailseries.com/pornstars"
     
     try:
