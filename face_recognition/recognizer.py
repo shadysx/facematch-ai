@@ -127,7 +127,7 @@ class FaceRecognizer:
         seen_names = set()  
         for _, distances in self.all_distances.items():
             sorted_distances = sorted(distances.items(), key=lambda x: x[1])
-            for file_path in sorted_distances:
+            for file_path, _ in sorted_distances:
                 name = file_path.split('/')[0]
                 if name not in seen_names:
                     names_by_distance.append(name)
