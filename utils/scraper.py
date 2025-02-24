@@ -4,8 +4,8 @@ import os
 import re
 from urllib.parse import urljoin
 
-def download_images(url, actress_name='downloaded_images', image_to_download=5):
-    output_folder = os.path.join('downloaded_images', actress_name)
+def download_images(url, actress_name='default_name', image_to_download=5):
+    output_folder = os.path.join('../downloaded_images', actress_name)
     
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
