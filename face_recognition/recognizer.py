@@ -25,6 +25,7 @@ class FaceRecognizer:
         # When called from the API
         self.unknown_uploaded_image = ""
         self.descriptors_file = "../known_faces_descriptors.pkl"
+        self.is_training
 
     def save_known_faces(self, file_path):
         with open(file_path, 'wb') as f:
@@ -95,7 +96,6 @@ class FaceRecognizer:
             self.all_distances[unknown_uploaded_image] = {}
             n_known_faces = len(self.known_faces)
 
-            print(f"Comparing with {n_known_faces} known faces")
             for file_path, known_descriptor in self.known_faces.items():
                 distance = np.linalg.norm(face_descriptor - known_descriptor)
                 self.all_distances[unknown_uploaded_image][file_path] = distance
@@ -108,6 +108,7 @@ class FaceRecognizer:
     def load_and_compute_known_faces(self):
         """Load known faces from file or compute and save them if file doesn't exist."""
         if not self.load_known_faces(self.descriptors_file):
+            self.is_training = True
             for root, dirs, files in os.walk(self.known_faces_folder):
                 for f in files:
                     if f.endswith('.jpg'):
@@ -116,6 +117,7 @@ class FaceRecognizer:
                         name = os.path.splitext(relative_path)[0]
                         self.compute_face_descriptor(full_path, label=name)
             self.save_known_faces(self.descriptors_file)
+            self.is_training = False
     
     def get_n_closest_names_by_distance(self, n=10):
         # First names are the closest matches
