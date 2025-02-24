@@ -9,7 +9,7 @@ async def compare_face(file: UploadFile):
     recognizer = FaceRecognizer()
     recognizer.load_and_compute_known_faces()
     await recognizer.compare_with_known_faces_from_upload(file)
-    return recognizer.build_matches_with_images_response(1)
+    return recognizer.get_n_closest_names_by_distance(1)
 
 @app.post("/get-matches-with-images")
 async def get_matches_with_images(file: UploadFile):
