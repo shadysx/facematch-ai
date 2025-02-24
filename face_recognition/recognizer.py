@@ -149,6 +149,8 @@ class FaceRecognizer:
             })
         return matches
 
+    def is_training(self):
+        return self.is_training
 
     def clean_training_data(self):
         if os.path.exists("../known_faces_descriptors.pkl"):

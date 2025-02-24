@@ -16,7 +16,7 @@ async def compare_face(file: UploadFile):
 @app.post("/get-matches-with-images")
 async def get_matches_with_images(file: UploadFile):
     recognizer = FaceRecognizer()
-    if recognizer.is_training:
+    if recognizer.is_training():
         return {"message": "Training in progress, please wait..."}
     recognizer.load_and_compute_known_faces()
     await recognizer.compare_with_known_faces_from_upload(file)
@@ -25,7 +25,7 @@ async def get_matches_with_images(file: UploadFile):
 @app.post("/clean-training-data")
 async def clean_training_data():
     recognizer = FaceRecognizer()
-    if recognizer.is_training:
+    if recognizer.is_training():
         return {"message": "Training in progress, please wait..."}
     recognizer.clean_training_data()
     return {"message": "Training data cleaned"}
@@ -38,12 +38,7 @@ async def is_cuda_enabled():
 @app.get("/is-training")
 async def is_training():
     recognizer = FaceRecognizer()
-    return {"is_training": recognizer.is_training}
-
-# Test endpoint
-@app.get("/hello")
-async def hello_world():
-    return {"message": "Hello World!"}
+    return {"is_training": recognizer.is_training()}
 
 if __name__ == "__main__":
     import uvicorn
