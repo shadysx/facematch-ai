@@ -39,17 +39,21 @@ class FaceRecognizer:
         return False
 
     def compute_face_descriptor(self, img_path, label=None):
-        img = dlib.load_rgb_image(img_path)
-        dets = self.detector(img, 1)
-        face_descriptors = [] 
-        for k, d in enumerate(dets):
-            shape = self.sp(img, d)
-            face_descriptor = np.array(self.facerec.compute_face_descriptor(img, shape))
-            if label: 
-                self.known_faces[f"{label}_{k}"] = face_descriptor
-                print(f"Face {k} registered for: {label}")
-            face_descriptors.append(face_descriptor)
-        return face_descriptors
+        try:
+            img = dlib.load_rgb_image(img_path)
+            dets = self.detector(img, 1)
+            face_descriptors = [] 
+            for k, d in enumerate(dets):
+                shape = self.sp(img, d)
+                face_descriptor = np.array(self.facerec.compute_face_descriptor(img, shape))
+                if label: 
+                    self.known_faces[f"{label}_{k}"] = face_descriptor
+                    print(f"Face {k} registered for: {label}")
+                face_descriptors.append(face_descriptor)
+            return face_descriptors
+        except Exception as e:
+            print(f"Error computing face descriptor: {e}")
+            return None
 
     def compare_with_known_faces(self, img_path):
         try:
