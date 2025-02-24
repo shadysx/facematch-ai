@@ -25,7 +25,7 @@ class FaceRecognizer:
         # When called from the API
         self.unknown_uploaded_image = ""
         self.descriptors_file = "../known_faces_descriptors.pkl"
-        self.is_training
+        self.is_training = False
 
     def save_known_faces(self, file_path):
         with open(file_path, 'wb') as f:
@@ -119,16 +119,25 @@ class FaceRecognizer:
             self.save_known_faces(self.descriptors_file)
             self.is_training = False
     
-    def get_n_closest_names_by_distance(self, n=10):
+    def get_n_closest_names_by_distance(self, n):
         # First names are the closest matches
         names_by_distance = []
+
+        # To avoid duplicates
+        seen_names = set()  
         for _, distances in self.all_distances.items():
             sorted_distances = sorted(distances.items(), key=lambda x: x[1])
-            for file_path, distance in sorted_distances[:n]:
-                names_by_distance.append(file_path.split('/')[0])
+            for file_path in sorted_distances:
+                name = file_path.split('/')[0]
+                if name not in seen_names:
+                    names_by_distance.append(name)
+                    seen_names.add(name)
+                    if len(names_by_distance) >= n:
+                        return names_by_distance
         return names_by_distance
     
-    def build_matches_with_images_response(self, n=10):
+    # TODO: Avoid duplicates
+    def build_n_matches_with_images_response(self, n):
         names_by_distance = self.get_n_closest_names_by_distance(n)
         matches = []
         for match_name in names_by_distance:
