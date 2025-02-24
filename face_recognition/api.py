@@ -9,7 +9,14 @@ async def compare_face(file: UploadFile):
     recognizer = FaceRecognizer()
     recognizer.load_and_compute_known_faces()
     await recognizer.compare_with_known_faces_from_upload(file)
-    return recognizer.get_n_closest_matches(5)
+    return recognizer.build_matches_response(1)
+
+@app.post("/clean-training-data")
+async def clean_training_data():
+    recognizer = FaceRecognizer()
+    recognizer.clean_training_data()
+    return {"message": "Training data cleaned"}
+
 
 # Test endpoint
 @app.get("/hello")

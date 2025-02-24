@@ -6,6 +6,7 @@ import pickle
 import numpy as np
 from fastapi import UploadFile
 import cv2
+import base64
 
 class FaceRecognizer:
     def __init__(self):
@@ -13,12 +14,17 @@ class FaceRecognizer:
         self.sp = dlib.shape_predictor("../models/shape_predictor_5_face_landmarks.dat")
         self.facerec = dlib.face_recognition_model_v1("../models/dlib_face_recognition_resnet_model_v1.dat")
         self.known_faces = {} 
+        # Here are the matches found (Not returned yet)
         self.matches_found = []
-        self.all_distances = {}  
-        self.known_faces_folder = "../downloaded_images"
-        self.unknown_face_path = "../faces/unknown/unknown_face.jpg"
-        self.descriptors_file = "../known_faces_descriptors.pkl"
         self.threshold = 0.5
+        # Here are the distances between the unknown face and the known faces
+        self.all_distances = {} # Key is the unknown face, value is a dictionary of known faces and their distances
+        self.known_faces_folder = "../downloaded_images"
+        # When called from the script
+        self.unknown_face_path = "../faces/unknown/unknown_face.jpg"
+        # When called from the API
+        self.unknown_uploaded_image = ""
+        self.descriptors_file = "../known_faces_descriptors.pkl"
 
     def save_known_faces(self, file_path):
         with open(file_path, 'wb') as f:
@@ -72,16 +78,18 @@ class FaceRecognizer:
         if len(dets) == 0:
             print("No face detected in the image")
             return
+
         # Use the first detected face
         shape = self.sp(img_rgb, dets[0])
         face_descriptor = np.array(self.facerec.compute_face_descriptor(img_rgb, shape))
-        unknown_img_name = upload_file.filename
-        self.all_distances[unknown_img_name] = {}
+        unknown_uploaded_image = upload_file.filename
+        self.all_distances[unknown_uploaded_image] = {}
         n_known_faces = len(self.known_faces)
+
         print(f"Comparing with {n_known_faces} known faces")
         for file_path, known_descriptor in self.known_faces.items():
             distance = np.linalg.norm(face_descriptor - known_descriptor)
-            self.all_distances[unknown_img_name][file_path] = distance
+            self.all_distances[unknown_uploaded_image][file_path] = distance
             if distance < self.threshold:
                 self.matches_found.append(file_path)
 
@@ -97,31 +105,49 @@ class FaceRecognizer:
                         self.compute_face_descriptor(full_path, label=name)
             self.save_known_faces(self.descriptors_file)
     
-    def get_n_closest_matches(self, n=10):
-        matches = []
+    def get_n_closest_names_by_distance(self, n):
+        # First names are the closest matches
+        names_by_distance = []
         for _, distances in self.all_distances.items():
             sorted_distances = sorted(distances.items(), key=lambda x: x[1])
             for file_path, distance in sorted_distances[:n]:
-                matches.append({
-                    "name": file_path.split('/')[0],
-                    "distance": distance,
-                    "pictures": []
-                })
-        return {"matches": matches}
+                names_by_distance.append(file_path.split('/')[0])
+        return names_by_distance
     
+    def build_matches_response(self, n=10):
+        names_by_distance = self.get_n_closest_names_by_distance(n)
+        matches = []
+        for match_name in names_by_distance:
 
-if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == "clean":
+            folder = os.path.join(self.known_faces_folder, match_name)
+            jpg_files = glob.glob(os.path.join(folder, "*.jpg"))
+
+            images_from_match = []
+
+            for jpg_file in jpg_files:
+                # Read the image and encode it in base64
+                image_data = base64.b64encode(open(jpg_file, "rb").read()).decode('utf-8')
+                images_from_match.append(image_data)
+
+            matches.append({
+                "name": match_name,
+                "images": images_from_match
+            })
+        return matches
+
+
+    def clean_training_data(self):
         if os.path.exists("../known_faces_descriptors.pkl"):
             os.remove("../known_faces_descriptors.pkl")
-            print("Starting clean")
+
+
+if __name__ == "__main__":
+    recognizer = FaceRecognizer()
+    if len(sys.argv) > 1 and sys.argv[1] == "clean":
+        recognizer.clean_training_data()
+        exit()
 
     if dlib.DLIB_USE_CUDA:
         print("CUDA is enabled")
     else:
         print("CUDA is disabled")
-
-    recognizer = FaceRecognizer()
-    recognizer.load_and_compute_known_faces()
-    recognizer.compare_with_known_faces(recognizer.unknown_face_path)
-    print(recognizer.get_n_closest_matches())
