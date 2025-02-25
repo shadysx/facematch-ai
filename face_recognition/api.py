@@ -4,6 +4,14 @@ from recognizer import FaceRecognizer
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  
+    allow_credentials=False,
+    allow_methods=["*"],  
+    allow_headers=["*"],  
+)
+
 @app.post("/get-matches-names")
 async def compare_face(file: UploadFile):
     recognizer = FaceRecognizer()
