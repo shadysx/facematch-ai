@@ -136,7 +136,6 @@ class FaceRecognizer:
                         return names_by_distance
         return names_by_distance
     
-    # TODO: Avoid duplicates
     def build_n_matches_with_images_response(self, n):
         names_by_distance = self.get_n_closest_names_by_distance(n)
         matches = []

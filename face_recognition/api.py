@@ -21,10 +21,10 @@ async def compare_face(file: UploadFile):
     await recognizer.compare_with_known_faces_from_upload(file)
     return recognizer.get_n_closest_names_by_distance(5)
 
-@app.post("/get-matches-with-images")
-async def get_matches_with_images(file: UploadFile):
+@app.post("/get-matches-names-with-images")
+async def get_matches_names_with_images(file: UploadFile):
     recognizer = FaceRecognizer()
-    if recognizer.is_training():
+    if recognizer.is_training:
         return {"message": "Training in progress, please wait..."}
     recognizer.load_and_compute_known_faces()
     await recognizer.compare_with_known_faces_from_upload(file)
@@ -33,7 +33,7 @@ async def get_matches_with_images(file: UploadFile):
 @app.post("/clean-training-data")
 async def clean_training_data():
     recognizer = FaceRecognizer()
-    if recognizer.is_training():
+    if recognizer.is_training:
         return {"message": "Training in progress, please wait..."}
     recognizer.clean_training_data()
     return {"message": "Training data cleaned"}
